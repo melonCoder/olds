@@ -11,10 +11,14 @@
 
 BOT_NAME = 'olds'
 
+ITEM_PIPELINES = {'olds.pipelines.OldsPipeline': 300,}
 SPIDER_MODULES = ['olds.spiders']
-OLDSSPIDER_MODULE = 'olds.spiders'
-ITEM_PIPELINES = ['olds.pipelines.OldsPipeline',]
+OLDSSPIDER_MODULES = 'olds_spiders'
 
+MONGODB_SERVER = "localhost"
+MONGODB_PORT = 27017
+MONGODB_DB = "olds"
+MONGODB_COLLECTION = "ols_details"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (X11; linux x86_64; rv:7.0.1), Geoko/20100101 Firefox/7.7'

@@ -1,0 +1,8 @@
+#python
+*.py[c|o|d]
+*.so
+*.egg
+*.egg-info
+
+#dir
+/data
