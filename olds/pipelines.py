@@ -17,9 +17,13 @@ class OldsPipeline(object):
         self.collection = db[settings['MONGODB_COLLECTION']]
 
     def process_item(self, item, spider):
-        if spider.name != "olds":
-            return item
         if item.get("olds_thread", None) is None:
+            return item
+
+        #To avoid incomplete / unecessary items
+        #todo
+        #    do this job in spider
+        if item.get("oriSource", None) is None:
             return item
 
         spec = {"olds_thread":item["olds_thread"]}

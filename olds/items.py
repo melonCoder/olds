@@ -12,6 +12,7 @@ class OldsItem(Item):
     title = Field()
     editor = Field()
     source = Field()
+    oriSource = Field()
     #time
     year = Field()
     month = Field()

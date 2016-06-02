@@ -4,25 +4,28 @@ from scrapy.selector import Selector
 from olds.items import OldsItem
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
+import datetime
 
-class OldsSpider(CrawlSpider):
-    name = "olds"
-    allowed_domains = ["tech.163.com"]
-    start_urls = ['http://tech.163.com']
+class spider_163(CrawlSpider):
+    name = "spider_163"
+    allowed_domains = ["news.163.com"]
+    start_urls = ['http://news.163.com']
+    allowed_urls = datetime.datetime.now().strftime("/%y/%m\d+/\d+/*")
     rules = (
         Rule(
-            LinkExtractor(allow=r"/16/05\d+/\d+/*"),
+            LinkExtractor(allow=re.compile(allowed_urls)),
             callback = "parse_item",
-            follow = False ##whether to continue recursively
+            follow = True ##whether to continue recursively
             ),
     )
 
     def parse_item(self, response):
         item = OldsItem()
         item['olds_thread'] = response.url.strip().split('/')[-1][:-5]
+        item['source'] = "163"
         self.get_title(response, item)
         self.get_editor(response, item)
-        self.get_source(response, item)
+        self.get_oriSource(response, item)
         self.get_date(response, item)
         self.get_passage(response, item)
         return item
@@ -31,34 +34,27 @@ class OldsSpider(CrawlSpider):
         title = response.xpath("/html/head/title/text()").extract()
         if title:
             item['title'] = title[0][:-5]
-#            zh_print(item['title'])
 
     def get_editor(self, response, item):
         editor= response.xpath("//span[@class='ep-editor']/text()").extract()
         if editor:
             item['editor'] = editor[0][5:-7]
-#            zh_print(item['editor'])
 
-    def get_source(self, response, item):
-        source = response.xpath('//span[@class="left"]/text()').extract()
-        if source:
-            item['source'] = source[0][6:]
-#            zh_print(item['source'])
+    def get_oriSource(self, response, item):
+        oriSource = response.xpath('//span[@class="left"]/text()').extract()
+        if oriSource:
+            item['oriSource'] = oriSource[0][6:]
 
     def get_date(self, response, item):
         date_source = response.xpath("//div[@class='post_time_source']/text()").extract()
-        date = date_source[0].strip('\n').strip().split()[0].split('-')#remove \n and space
-        if date:
+        if date_source:
+            date = date_source[0].strip('\n').strip().split()[0].split('-')#remove \n and space
             item['year'] = date[0]
             item['month'] = date[1]
             item['day'] = date[2]
 
     def get_passage(self, response, item):
-        passage = response.xpath("//div[@class='post_text']/p/text()").extract()
+        passage = response.xpath("//div[@id='endText']/p/text()").extract()
         if passage:
             item['passage'] = "".join(passage)
 
-def zh_print(ss):
-    for s in ss:
-        print s.encode("GBK");
-    return
